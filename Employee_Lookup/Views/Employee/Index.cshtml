@@ -1,0 +1,753 @@
+﻿@model SearchViewModel
+@{
+    ViewData["Title"] = "Tra cứu nhân sự";
+}
+
+<div class="search-section" style="background: #198754">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center mb-4 text-white">
+                    <i class="fas fa-search"></i> Tra cứu thông tin nhân sự
+                </h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Search" method="post" id="searchForm">
+                            <input type="hidden" asp-for="SortBy" />
+                            <input type="hidden" asp-for="SortDirection" />
+                            <input type="hidden" asp-for="PageNumber" />
+                            <input type="hidden" asp-for="PageSize" value="10" />
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="employeeName" class="form-label text-dark"></label>
+                                    <input asp-for="employeeName" class="form-control" placeholder="Nhập tên nhân sự">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="employeeCode" class="form-label text-dark"></label>
+                                    <input asp-for="employeeCode" class="form-control" placeholder="Nhập mã nhân sự">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="departmentCode" class="form-label text-dark"></label>
+                                    <input asp-for="departmentCode" class="form-control" placeholder="Nhập mã phòng ban">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-search btn-lg me-2 btn-find" id="searchBtn">
+                                        <i class="fas fa-search find"></i> <span id="searchBtnText">Tìm kiếm</span>
+                                    </button>
+                                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg btn-rotate-reset">
+                                        <i class="fas fa-refresh rotate-reset"></i> Xem tất cả
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4 results-section">
+    <div class="row">
+        <div class="col-12">
+            <!-- Alert messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show animate-slide-down" role="alert">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show animate-slide-down" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> @Model.SearchType
+                    </h5>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-primary fs-6">Tổng: @Model.TotalRecords nhân sự</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.SearchResults.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center sortable" data-sort="employeeName">
+                                            @Html.DisplayNameFor(m => m.SearchResults.FirstOrDefault().employeeName)
+                                            <span class="sort-icon">
+                                                @if (Model.SortBy == "employeeName")
+                                                {
+                                                    if (Model.SortDirection == "asc")
+                                                    {
+                                                        <i class="fas fa-sort-up"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-sort-down"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-sort"></i>
+                                                }
+                                            </span>
+                                        </th>
+                                        <th class="text-center sortable" data-sort="employeeCode">
+                                            @Html.DisplayNameFor(m => m.SearchResults.FirstOrDefault().employeeCode)
+                                            <span class="sort-icon">
+                                                @if (Model.SortBy == "employeeCode")
+                                                {
+                                                    if (Model.SortDirection == "asc")
+                                                    {
+                                                        <i class="fas fa-sort-up"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-sort-down"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-sort"></i>
+                                                }
+                                            </span>
+                                        </th>
+                                        <th class="text-center sortable" data-sort="email">
+                                            @Html.DisplayNameFor(m => m.SearchResults.FirstOrDefault().email)
+                                            <span class="sort-icon">
+                                                @if (Model.SortBy == "email")
+                                                {
+                                                    if (Model.SortDirection == "asc")
+                                                    {
+                                                        <i class="fas fa-sort-up"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-sort-down"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-sort"></i>
+                                                }
+                                            </span>
+                                        </th>
+                                        <th class="text-center sortable" data-sort="departmentCode">
+                                            @Html.DisplayNameFor(m => m.SearchResults.FirstOrDefault().departmentCode)
+                                            <span class="sort-icon">
+                                                @if (Model.SortBy == "departmentCode")
+                                                {
+                                                    if (Model.SortDirection == "asc")
+                                                    {
+                                                        <i class="fas fa-sort-up"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-sort-down"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-sort"></i>
+                                                }
+                                            </span>
+                                        </th>
+                                        <th class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var employee in Model.SearchResults)
+                                    {
+                                        <tr class="table-row-animated">
+                                            <td class="text-center"><strong>@employee.employeeName</strong></td>
+                                            <td class="text-center"><strong>@employee.employeeCode</strong></td>
+                                            <td class="text-center">@employee.email</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info">@employee.departmentCode</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="@Url.Action("Edit", new { employeeCode = employee.employeeCode })"
+                                                   class="btn btn-sm btn-primary btn-edit animate-edit-btn"
+                                                   title="Chỉnh sửa thông tin nhân viên">
+                                                    <i class="fas fa-edit"></i> Sửa
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <nav aria-label="Phân trang danh sách nhân sự" class="mt-4">
+                                <ul class="pagination justify-content-center pagination-custom">
+                                    <!-- First page -->
+                                    @if (Model.HasPreviousPage)
+                                    {
+                                        <li class="page-item">
+                                            <button type="button" class="page-link pagination-btn" data-page="1" title="Trang đầu">
+                                                <i class="fas fa-angle-double-left"></i>
+                                            </button>
+                                        </li>
+                                        <li class="page-item">
+                                            <button type="button" class="page-link pagination-btn" data-page="@(Model.PageNumber - 1)" title="Trang trước">
+                                                <i class="fas fa-angle-left"></i>
+                                            </button>
+                                        </li>
+                                    }
+
+                                    <!-- Page numbers -->
+                                    @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                                    {
+                                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                            <button type="button" class="page-link pagination-btn @(i == Model.PageNumber ? "current-page" : "")"
+                                                    data-page="@i" title="Trang @i">
+                                                @i
+                                            </button>
+                                        </li>
+                                    }
+
+                                    <!-- Next and Last page -->
+                                    @if (Model.HasNextPage)
+                                    {
+                                        <li class="page-item">
+                                            <button type="button" class="page-link pagination-btn" data-page="@(Model.PageNumber + 1)" title="Trang sau">
+                                                <i class="fas fa-angle-right"></i>
+                                            </button>
+                                        </li>
+                                        <li class="page-item">
+                                            <button type="button" class="page-link pagination-btn" data-page="@Model.TotalPages" title="Trang cuối">
+                                                <i class="fas fa-angle-double-right"></i>
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+
+                            <!-- Page info -->
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Trang @Model.PageNumber / @Model.TotalPages
+                                    (@Model.PageSize nhân sự mỗi trang)
+                                </small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 empty-state">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Không tìm thấy nhân sự nào</h4>
+                            <p class="text-muted">Vui lòng thử lại với từ khóa khác</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Pagination styles */
+    .pagination-custom {
+        --bs-pagination-padding-x: 0.75rem;
+        --bs-pagination-padding-y: 0.5rem;
+        --bs-pagination-font-size: 0.875rem;
+        --bs-pagination-color: #6c757d;
+        --bs-pagination-bg: #fff;
+        --bs-pagination-border-width: 1px;
+        --bs-pagination-border-color: #dee2e6;
+        --bs-pagination-border-radius: 8px;
+        --bs-pagination-hover-color: #0056b3;
+        --bs-pagination-hover-bg: #f8f9fa;
+        --bs-pagination-hover-border-color: #dee2e6;
+        --bs-pagination-focus-color: #0056b3;
+        --bs-pagination-focus-bg: #e7f3ff;
+        --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        --bs-pagination-active-color: #fff;
+        --bs-pagination-active-bg: #0d6efd;
+        --bs-pagination-active-border-color: #0d6efd;
+        --bs-pagination-disabled-color: #6c757d;
+        --bs-pagination-disabled-bg: #fff;
+        --bs-pagination-disabled-border-color: #dee2e6;
+    }
+
+    .pagination-btn {
+        transition: all 0.3s ease;
+        border: none;
+        background: none;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .pagination-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: var(--bs-pagination-hover-bg) !important;
+            color: var(--bs-pagination-hover-color) !important;
+        }
+
+        .pagination-btn:active {
+            transform: translateY(0);
+        }
+
+    .current-page {
+        background-color: var(--bs-pagination-active-bg) !important;
+        color: var(--bs-pagination-active-color) !important;
+        border-color: var(--bs-pagination-active-border-color) !important;
+        font-weight: 600;
+    }
+
+        .current-page:hover {
+            background-color: var(--bs-pagination-active-bg) !important;
+            color: var(--bs-pagination-active-color) !important;
+        }
+
+    /* Loading state for pagination */
+    .pagination-loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+        .pagination-loading .pagination-btn {
+            position: relative;
+        }
+
+            .pagination-loading .pagination-btn::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 12px;
+                height: 12px;
+                margin: -6px 0 0 -6px;
+                border: 2px solid transparent;
+                border-top: 2px solid #6c757d;
+                border-radius: 50%;
+                animation: pagination-spin 1s linear infinite;
+            }
+
+    keyframes pagination-spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Responsive pagination */
+    media (max-width: 576px) {
+        .pagination-custom
+
+    {
+        --bs-pagination-padding-x: 0.5rem;
+        --bs-pagination-padding-y: 0.375rem;
+        --bs-pagination-font-size: 0.75rem;
+    }
+
+    .pagination-custom .page-item:not(.active):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+        display: none;
+    }
+
+    }
+
+    /* Additional animations for table rows */
+    .table-row-animated {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideInRow 0.5s ease-out forwards;
+    }
+
+        .table-row-animated:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .table-row-animated:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .table-row-animated:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .table-row-animated:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .table-row-animated:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .table-row-animated:nth-child(n+6) {
+            animation-delay: 0.35s;
+        }
+
+    keyframes slideInRow {
+        to
+
+    {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Alert animations */
+    .animate-slide-down {
+        animation: slideDownAlert 0.5s ease-out;
+    }
+
+    keyframes slideDownAlert {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Edit button styling */
+    .btn-edit {
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-size: 0.875rem;
+        padding: 6px 12px;
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            background-color: #0056b3 !important;
+        }
+
+        .btn-edit:active {
+            transform: translateY(0);
+        }
+
+    /* Animation for edit buttons */
+    .animate-edit-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .animate-edit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .animate-edit-btn:hover::before {
+            left: 100%;
+        }
+
+    /* Form group hover effect */
+    .col-md-4 {
+        transition: transform 0.3s ease;
+    }
+
+        .form-control:focus + .col-md-4,
+        .col-md-4:hover {
+            transform: translateY(-2px);
+        }
+
+    /* Loading state for search button */
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+    keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Responsive adjustments */
+    media (max-width: 768px) {
+        .btn-edit
+
+    {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+    }
+
+    }</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize sortable headers
+        initializeSortableHeaders();
+
+        // Initialize pagination
+        initializePagination();
+
+        // Add form enhancements
+        addFormEnhancements();
+
+        // Add ripple effect to buttons
+        addRippleEffect();
+
+        // Add loading state to search form
+        addLoadingState();
+
+        // Auto-hide alerts
+        autoHideAlerts();
+    });
+
+    function initializeSortableHeaders() {
+        const sortableHeaders = document.querySelectorAll('.sortable');
+
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const sortBy = this.getAttribute('data-sort');
+                const currentSortBy = '@Model.SortBy';
+                const currentSortDirection = '@Model.SortDirection';
+
+                let newSortDirection = 'asc';
+
+                // If currently sorting by this column, toggle direction
+                if (sortBy === currentSortBy) {
+                    newSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                }
+
+                // Update hidden fields
+                document.querySelector('input[name="SortBy"]').value = sortBy;
+                document.querySelector('input[name="SortDirection"]').value = newSortDirection;
+                document.querySelector('input[name="PageNumber"]').value = 1; // Reset to first page
+
+                // Add loading state and submit
+                const form = document.querySelector('#searchForm');
+                addFormLoadingState(form);
+                form.submit();
+            });
+        });
+    }
+
+    function initializePagination() {
+        const paginationBtns = document.querySelectorAll('.pagination-btn');
+
+        paginationBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pageNumber = this.getAttribute('data-page');
+                const form = document.querySelector('#searchForm');
+
+                // Update page number
+                document.querySelector('input[name="PageNumber"]').value = pageNumber;
+
+                // Add loading state to pagination
+                addPaginationLoadingState();
+
+                // Submit form
+                form.submit();
+            });
+        });
+    }
+
+    function addPaginationLoadingState() {
+        const pagination = document.querySelector('.pagination-custom');
+        if (pagination) {
+            pagination.classList.add('pagination-loading');
+        }
+    }
+
+    function addFormEnhancements() {
+        // Add focus animations to form controls
+        const formControls = document.querySelectorAll('.form-control');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.closest('.col-md-4').style.transform = 'translateY(-2px)';
+            });
+
+            control.addEventListener('blur', function() {
+                this.closest('.col-md-4').style.transform = 'translateY(0)';
+            });
+
+            // Add typing animation
+            control.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.borderColor = 'var(--success-color)';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+        });
+    }
+
+    function addRippleEffect() {
+        const buttons = document.querySelectorAll('.btn, .pagination-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.remove();
+                    }
+                }, 600);
+            });
+        });
+    }
+
+    function addLoadingState() {
+        const searchForm = document.getElementById('searchForm');
+        const searchBtn = document.getElementById('searchBtn');
+
+        if (searchForm && searchBtn) {
+            searchForm.addEventListener('submit', function(e) {
+                // Reset page number when searching
+                document.querySelector('input[name="PageNumber"]').value = 1;
+                addFormLoadingState(this);
+            });
+        }
+    }
+
+    function addFormLoadingState(form) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('#searchBtnText');
+        const btnIcon = submitBtn.querySelector('.find');
+
+        if (submitBtn && btnText && btnIcon) {
+            // Add loading class
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+
+            // Hide text and icon
+            btnText.style.opacity = '0';
+            btnIcon.style.opacity = '0';
+
+            // Show loading spinner (handled by CSS)
+        }
+    }
+
+    function autoHideAlerts() {
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 500);
+                }
+            });
+        }, 5000);
+    }
+
+    // Stagger animation for table rows on page load
+    function staggerTableRows() {
+        const rows = document.querySelectorAll('.table-row-animated');
+        rows.forEach((row, index) => {
+            setTimeout(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
+
+    // Call stagger animation after DOM is loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', staggerTableRows);
+    } else {
+        staggerTableRows();
+    }
+
+    // Add ripple effect style
+    const style = document.createElement('style');
+    style.textContent = `
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>

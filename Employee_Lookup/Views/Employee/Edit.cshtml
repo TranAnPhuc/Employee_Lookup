@@ -1,0 +1,387 @@
+﻿@model Employee_Lookup.Models.Employee
+@{
+    ViewData["Title"] = "Cập nhật thông tin nhân viên";
+}
+
+<div class="edit-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0; min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-lg border-0 edit-card">
+                    <div class="card-header bg-gradient-primary text-white text-center py-4">
+                        <h3 class="mb-0">
+                            <i class="fas fa-user-edit"></i> Cập nhật thông tin nhân viên
+                        </h3>
+                        <p class="mb-0 mt-2">Mã nhân viên: <strong>@Model.employeeCode</strong></p>
+                    </div>
+                    <div class="card-body p-5">
+                        <!-- Alert messages -->
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show animate-fade-in" role="alert">
+                                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show animate-fade-in" role="alert">
+                                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form asp-action="Edit" asp-route-employeeCode="@Model.employeeCode" method="post" id="editForm" class="needs-validation" novalidate>
+                            <div class="row">
+                                <div class="col-12 mb-4">
+                                    <div class="form-group">
+                                        <label asp-for="employeeName" class="form-label fw-bold">
+                                            <i class="fas fa-user text-primary"></i> Tên nhân viên
+                                        </label>
+                                        <input asp-for="employeeName" class="form-control form-control-lg animate-input"
+                                               placeholder="Nhập tên nhân viên" required>
+                                        <span asp-validation-for="employeeName" class="text-danger"></span>
+                                        <div class="invalid-feedback">
+                                            Vui lòng nhập tên nhân viên.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="form-group">
+                                        <label asp-for="employeeCode" class="form-label fw-bold">
+                                            <i class="fas fa-id-card text-info"></i> Mã nhân viên
+                                        </label>
+                                        <input asp-for="employeeCode" class="form-control form-control-lg"
+                                               placeholder="Mã nhân viên" readonly style="background-color: #f8f9fa;">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="form-group">
+                                        <label asp-for="departmentCode" class="form-label fw-bold">
+                                            <i class="fas fa-building text-success"></i> Mã phòng ban
+                                        </label>
+                                        <input asp-for="departmentCode" class="form-control form-control-lg animate-input"
+                                               placeholder="Nhập mã phòng ban" required>
+                                        <span asp-validation-for="departmentCode" class="text-danger"></span>
+                                        <div class="invalid-feedback">
+                                            Vui lòng nhập mã phòng ban.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <div class="form-group">
+                                        <label asp-for="email" class="form-label fw-bold">
+                                            <i class="fas fa-envelope text-warning"></i> Email
+                                        </label>
+                                        <input asp-for="email" type="email" class="form-control form-control-lg animate-input"
+                                               placeholder="Nhập địa chỉ email" required>
+                                        <span asp-validation-for="email" class="text-danger"></span>
+                                        <div class="invalid-feedback">
+                                            Vui lòng nhập địa chỉ email hợp lệ.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-center gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 animate-btn" id="updateBtn">
+                                    <i class="fas fa-save"></i> <span id="updateBtnText">Cập nhật</span>
+                                    <div class="spinner-border spinner-border-sm d-none" id="updateSpinner"></div>
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg px-5 animate-btn">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom animations and styling */
+    .edit-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transform: translateY(-10px);
+        animation: slideDown 0.6s ease-out;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3) !important;
+    }
+
+    .animate-input {
+        transition: all 0.3s ease;
+        border: 2px solid #e9ecef;
+    }
+
+        .animate-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+    .animate-btn {
+        transition: all 0.3s ease;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+        .animate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .animate-btn:active {
+            transform: translateY(-1px);
+        }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .form-label {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-control-lg {
+        padding: 12px 16px;
+        font-size: 1rem;
+        border-radius: 10px;
+    }
+
+    /* Keyframe animations */
+    keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-10px);
+    }
+
+    }
+
+    keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Ripple effect */
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+    }
+
+    keyframes ripple-animation {
+        to
+
+    {
+        transform: scale(4);
+        opacity: 0;
+    }
+
+    }
+
+    /* Loading state */
+    .btn-loading {
+        position: relative;
+        pointer-events: none;
+    }
+
+        .btn-loading .spinner-border {
+            width: 1rem;
+            height: 1rem;
+        }
+
+    /* Responsive adjustments */
+    media (max-width: 768px) {
+        .edit-section
+
+    {
+        padding: 30px 0;
+    }
+
+    .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+
+    .d-flex.gap-3 {
+        flex-direction: column;
+    }
+
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize form validation
+        initializeFormValidation();
+
+        // Add input animations
+        addInputAnimations();
+
+        // Add button ripple effects
+        addRippleEffects();
+
+        // Handle form submission
+        handleFormSubmission();
+    });
+
+    function initializeFormValidation() {
+        const forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    // Focus on first invalid field
+                    const firstInvalidField = form.querySelector(':invalid');
+                    if (firstInvalidField) {
+                        firstInvalidField.focus();
+                        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                form.classList.add('was-validated');
+            });
+        });
+
+        // Real-time validation
+        const inputs = document.querySelectorAll('.animate-input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+    }
+
+    function addInputAnimations() {
+        const inputs = document.querySelectorAll('.animate-input');
+
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.closest('.form-group').style.transform = 'scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.closest('.form-group').style.transform = 'scale(1)';
+            });
+        });
+    }
+
+    function addRippleEffects() {
+        const buttons = document.querySelectorAll('.animate-btn');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.remove();
+                    }
+                }, 600);
+            });
+        });
+    }
+
+    function handleFormSubmission() {
+        const form = document.getElementById('editForm');
+        const updateBtn = document.getElementById('updateBtn');
+        const updateBtnText = document.getElementById('updateBtnText');
+        const updateSpinner = document.getElementById('updateSpinner');
+
+        if (form && updateBtn) {
+            form.addEventListener('submit', function(e) {
+                if (form.checkValidity()) {
+                    // Show loading state
+                    updateBtn.classList.add('btn-loading');
+                    updateBtn.disabled = true;
+                    updateBtnText.textContent = 'Đang cập nhật...';
+                    updateSpinner.classList.remove('d-none');
+
+                    // Add progress animation
+                    updateBtn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                }
+            });
+        }
+    }
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            if (alert) {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 500);
+            }
+        });
+    }, 5000);
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

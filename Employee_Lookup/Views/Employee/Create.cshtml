@@ -1,0 +1,249 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Employee_Lookup.Models.AddEmployee
+
+@{
+    ViewData["Title"] = "Thêm Nhân Viên Mới";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Thêm Nhân Viên Mới
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @* Hiển thị thông báo lỗi *@
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @* Hiển thị thông báo thành công *@
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post" id="employeeForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EmployeeCode" class="form-label fw-bold">
+                                    @Html.DisplayNameFor(model => model.EmployeeCode)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="EmployeeCode" class="form-control" placeholder="Nhập mã nhân viên..." id="employeeCodeInput" />
+                                    <span class="input-group-text" id="codeCheckIcon" style="display: none;">
+                                        <i class="fas fa-spinner fa-spin text-primary" id="checkingIcon"></i>
+                                        <i class="fas fa-check text-success" id="validIcon" style="display: none;"></i>
+                                        <i class="fas fa-times text-danger" id="invalidIcon" style="display: none;"></i>
+                                    </span>
+                                </div>
+                                <span asp-validation-for="EmployeeCode" class="text-danger small"></span>
+                                <div id="employeeCodeFeedback" class="form-text"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EmployeeName" class="form-label fw-bold">
+                                    @Html.DisplayNameFor(model => model.EmployeeName)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="EmployeeName" class="form-control" placeholder="Nhập tên nhân viên..." />
+                                <span asp-validation-for="EmployeeName" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DepartmentCode" class="form-label fw-bold">
+                                    @Html.DisplayNameFor(model => model.DepartmentCode)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="DepartmentCode" class="form-select" id="departmentSelect">
+                                    <option value="">-- Chọn phòng ban --</option>
+                                    <option value="IT">Công nghệ thông tin (IT)</option>
+                                    <option value="HR">Nhân sự (HR)</option>
+                                    <option value="AC">Kế toán (AC)</option>
+                                    <option value="CR">Quan hệ khách hàng (CR)</option>
+                                    <option value="CUT">Khâu cắt (CUT)</option>
+                                    <option value="DV">Phân công (DV)</option>
+                                    <option value="EMB-F1">Thêu Xưởng 1 (EMB-F1)</option>
+                                    <option value="F1">Xưởng 1 (F1)</option>
+                                    <option value="F2">Xưởng 2 (F2)</option>
+                                    <option value="FGW">Kho thành phẩm (FGW)</option>
+                                    <option value="GA">Tổng vụ (GA)</option>
+                                    <option value="ME">Cải tiến sản xuất (ME)</option>
+                                    <option value="PK">Bao bì (PK)</option>
+                                    <option value="PPIC">Lập kế hoạch sản xuất và kiểm soát hàng tồn kho (PPIC)</option>
+                                    <option value="QA">Đảm bảo Chất lượng (QA)</option>
+                                    <option value="WH">Kho (WH)</option>
+                                </select>
+                                <span asp-validation-for="DepartmentCode" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">
+                                    @Html.DisplayNameFor(model => model.Email)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email..." />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Quay lại
+                                    </a>
+                                    <button type="reset" class="btn btn-outline-secondary me-2" id="resetBtn">
+                                        <i class="fas fa-undo me-2"></i>
+                                        Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span class="btn-text">Thêm nhân viên</span>
+                                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            let checkTimeout;
+            const employeeCodeInput = $('#employeeCodeInput');
+            const codeCheckIcon = $('#codeCheckIcon');
+            const checkingIcon = $('#checkingIcon');
+            const validIcon = $('#validIcon');
+            const invalidIcon = $('#invalidIcon');
+            const feedback = $('#employeeCodeFeedback');
+            const submitBtn = $('#submitBtn');
+
+            // Kiểm tra mã nhân viên khi người dùng nhập
+            employeeCodeInput.on('input', function() {
+                const employeeCode = $(this).val().trim();
+
+                // Clear previous timeout
+                if (checkTimeout) {
+                    clearTimeout(checkTimeout);
+                }
+
+                if (employeeCode.length === 0) {
+                    hideAllIcons();
+                    return;
+                }
+
+                // Delay 800ms trước khi check
+                checkTimeout = setTimeout(() => {
+                    checkEmployeeCode(employeeCode);
+                }, 800);
+            });
+
+            function checkEmployeeCode(employeeCode) {
+                showCheckingIcon();
+
+                $.ajax({
+                    url: '@Url.Action("CheckEmployeeCodeExists", "Employee")',
+                    type: 'GET',
+                    data: { employeeCode: employeeCode },
+                    success: function(response) {
+                        if (response.error) {
+                            showInvalidIcon('Không thể kiểm tra mã nhân viên');
+                        } else if (response.exists) {
+                            showInvalidIcon('Mã nhân viên đã tồn tại');
+                            employeeCodeInput.addClass('is-invalid');
+                        } else {
+                            showValidIcon('Mã nhân viên khả dụng');
+                            employeeCodeInput.removeClass('is-invalid').addClass('is-valid');
+                        }
+                    },
+                    error: function() {
+                        showInvalidIcon('Lỗi khi kiểm tra mã nhân viên');
+                    }
+                });
+            }
+
+            function showCheckingIcon() {
+                codeCheckIcon.show();
+                checkingIcon.show();
+                validIcon.hide();
+                invalidIcon.hide();
+                feedback.text('Đang kiểm tra...').removeClass('text-success text-danger').addClass('text-muted');
+            }
+
+            function showValidIcon(message) {
+                checkingIcon.hide();
+                validIcon.show();
+                invalidIcon.hide();
+                feedback.text(message).removeClass('text-muted text-danger').addClass('text-success');
+            }
+
+            function showInvalidIcon(message) {
+                checkingIcon.hide();
+                validIcon.hide();
+                invalidIcon.show();
+                feedback.text(message).removeClass('text-muted text-success').addClass('text-danger');
+            }
+
+            function hideAllIcons() {
+                codeCheckIcon.hide();
+                feedback.text('');
+                employeeCodeInput.removeClass('is-valid is-invalid');
+            }
+
+            // Xử lý submit form
+            $('#employeeForm').on('submit', function() {
+                const btnText = submitBtn.find('.btn-text');
+                const spinner = submitBtn.find('.spinner-border');
+
+                submitBtn.prop('disabled', true);
+                btnText.text('Đang xử lý...');
+                spinner.removeClass('d-none');
+            });
+
+            // Reset form
+            $('#resetBtn').on('click', function() {
+                hideAllIcons();
+                feedback.text('');
+                employeeCodeInput.removeClass('is-valid is-invalid');
+            });
+
+            // Auto-hide alerts sau 5 giây
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}

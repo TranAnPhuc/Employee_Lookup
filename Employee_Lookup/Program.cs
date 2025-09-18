@@ -15,6 +15,9 @@ namespace Employee_Lookup
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 
+            // Thêm Localization service
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
             builder.Services.AddScoped<IApiService, ApiService>();
 
             // Add services to the container.
@@ -24,6 +27,9 @@ namespace Employee_Lookup
 
             // Cấu hình URLs
             builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:5001");
+
+            // Cấu hình ngôn ngữ hỗ trợ
+            var supportedCultures = new[] { "vi", "en", "zh-TW" };
 
             var app = builder.Build();
 
